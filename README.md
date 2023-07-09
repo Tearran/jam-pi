@@ -1,6 +1,6 @@
-# jam-pi
+# jampi-config
 
-Just another menu for Pi.
+Just another menu for Pi configuration.
 
 `jam-pi` is a front-end for configng, with support for TUI interfaces and GUI(NOTE) interfaces. It is a refactoring of `armbian-config` using Bash Utility, and allows for launching configuration scripts with functional programming to use with TUI, GUI(NOTE), or by passing command-line arguments.
 
