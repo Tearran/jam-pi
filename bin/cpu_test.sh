@@ -112,7 +112,7 @@ see_help(){
 
 	}
 
-check_opts()
+check_opts_1()
 {
     if [[ "$1" == -dev ]] ; then
         default="bash"
@@ -143,6 +143,55 @@ check_opts()
     fi
 }
 
+check_opts_2(){
+
+if [ "$1" == "-dev" ]; then
+  shift  # Shifts the arguments to the left, excluding the first argument ("-dev")
+  function_name="$1"  # Assigns the next argument as the function name
+  shift  # Shifts the arguments again to exclude the function name
+
+  case "$function_name" in
+    0) echo "Calling function 0 with arguments: $@" ;;
+    1) echo "Calling function 1 with arguments: $@" ;;
+    2) echo "Calling function 2 with arguments: $@" ;;
+    3) echo "Calling function 3 with arguments: $@" ;;
+    4) echo "Calling function 4 with arguments: $@" ;;
+    *) echo "Invalid function name" ;;
+  esac
+else
+  echo "No -dev flag found"
+fi
+
+}
+
+check_opts() {
+  if [ "$1" == "-dev" ]; then
+    shift  # Shifts the arguments to the left, excluding the first argument ("-dev")
+    function_name="$1"  # Assigns the next argument as the function name
+    shift  # Shifts the arguments again to exclude the function name
+
+    found=false
+
+    for ((i=0; i<${#functionarray[@]}; i++)); do
+      if [ "$function_name" == "${functionarray[i]}" ]; then
+        found=true
+        ${functionarray[i]} "$@"
+        break
+      fi
+    done
+
+    if [ "$found" == false ]; then
+      echo "Invalid function name"
+    fi
+
+  elif [ "$1" == "-h" ]; then
+    see_help
+  else
+    see_cpu
+  fi
+}
+
+#check_opts_test1 "$@"
 check_opts "$@"
 
 #cpu::set_freq $policy "$min_freq" "$max_freq" performance
