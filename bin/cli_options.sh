@@ -9,16 +9,18 @@
 #  CPU related tests.
 #
 
-LD_LIBRARY_PATH="/home/beta/.local/lib"
+[[ -d "$HOME/.local/lib/bash-utility" ]] && toollib="$HOME/.local/lib" ;
+[[ -d "/home/beta/.local/lib/bash-utility/" ]] && toollib="/usr/lib" ;
 
 # Source the files relative to the script location
-source "$HOME/.local/lib/bash-utility/string.sh"
-source "$HOME/.local/lib/bash-utility/collection.sh"
-source "$HOME/.local/lib/bash-utility/array.sh"
-source "$HOME/.local/lib/bash-utility/check.sh"
-source "$HOME/.local/lib/armbian-config/cpu.sh"
+source "$toollib/bash-utility/string.sh"
+source "$toollib/bash-utility/collection.sh"
+source "$toollib/bash-utility/array.sh"
+source "$toollib/bash-utility/check.sh"
+source "$toollib/armbian-config/cpu.sh"
 
-libpath="$HOME/.local/lib/armbian-config/cpu.sh"
+[[ -f "$HOME/.local/lib/armbian-config/cpu.sh" ]]  && libpath="$HOME/.local/lib/armbian-config/cpu.sh"
+[[ -f "/usr/lib/armbian-config/cpu.sh" ]]  && libpath="/usr/lib/armbian-config/cpu.sh"
 
 readarray -t functionarray < <(grep -oP '^\w+::\w+' "$libpath")
 readarray -t funnamearray < <(grep -oP '^\w+::\w+' "$libpath" | sed 's/.*:://')
@@ -35,7 +37,7 @@ see_help(){
 	echo "Usage: ${filename%.*} [ -h | -dev ]"
 	echo -e "Options:"
 	echo -e "	-h  Print this help."
-	echo -e "	-dev Options:"
+	echo -e "	dev Options:"
     for i in "${!functionarray[@]}"; do
 		printf '\t\t%s\t%s\n' "${functionarray[i]}" "${descriptionarray[i]}"
 	done
@@ -46,7 +48,7 @@ see_help(){
 # check for -h -dev @ $1
 # if -dev check @ $1 remove and shift $1 to check for x
 check_opts() {
-  if [ "$1" == "-dev" ]; then
+  if [ "$1" == "dev" ]; then
     shift  # Shifts the arguments to the left, excluding the first argument ("-dev")
     function_name="$1"  # Assigns the next argument as the function name
     shift  # Shifts the arguments again to exclude the function name
