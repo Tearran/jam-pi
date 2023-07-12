@@ -9,14 +9,30 @@
 #  CPU related tests.
 #
 
-LD_LIBRARY_PATH="/home/beta/.local/lib"
+
+directory="$(dirname "$(readlink -f "$0")")"
+filename=$(basename "${BASH_SOURCE[0]}")
+
+#libpath="$directory/../lib"
+#selfpath="$libpath/configng/cpu.sh"
+
+if [[ -d "$directory/../lib" ]]; then
+    libpath="$directory"/../lib
+elif [[ -d "/usr/lib/bash-utility" && -d "/usr/lib/configng" ]]; then
+    libpath="/usr/lib"
+elif [[ -d "/../functions/bash-utility-master/src" ]] ; then
+    libpath="$directory"/../functions/bash-utility-master/src
+else
+    echo "Libraries not found"
+    exit 0
+fi
 
 # Source the files relative to the script location
-source "/home/beta/.local/lib/bash-utility/string.sh"
-source "/home/beta/.local/lib/bash-utility/collection.sh"
-source "/home/beta/.local/lib/bash-utility/array.sh"
-source "/home/beta/.local/lib/bash-utility/check.sh"
-source "/home/beta/.local/lib/armbian-config/cpu.sh"
+source "$libpath/bash-utility/string.sh"
+source "$libpath/bash-utility/collection.sh"
+source "$libpath/bash-utility/array.sh"
+source "$libpath/bash-utility/check.sh"
+source "$libpath/configng/cpu.sh"
 
 # Rest of the script...
 # @description Print value from collection.
@@ -86,12 +102,10 @@ cat /etc/default/cpufrequtils
 
 }
 
-
-libpath="/home/beta/.local/lib/armbian-config/cpu.sh"
-readarray -t functionarray < <(grep -oP '^\w+::\w+' "$libpath")
-readarray -t funnamearray < <(grep -oP '^\w+::\w+' "$libpath" | sed 's/.*:://')
-readarray -t catagoryarray < <(grep -oP '^\w+::\w+' "$libpath" | sed 's/::.*//')
-readarray -t descriptionarray < <(grep -oP '^# @description.*' "$libpath" | sed 's/^# @description //')
+readarray -t functionarray < <(grep -oP '^\w+::\w+' "$libpath/configng/cpu.sh")
+readarray -t funnamearray < <(grep -oP '^\w+::\w+' "$libpath/configng/cpu.sh" | sed 's/.*:://')
+readarray -t catagoryarray < <(grep -oP '^\w+::\w+' "$libpat/configng/cpu.sh" | sed 's/::.*//')
+readarray -t descriptionarray < <(grep -oP '^# @description.*' "$libpath/configng/cpu.sh" | sed 's/^# @description //')
 
 #printf '%s\n' "${functionarray[@]}"
 #exit 0
@@ -198,5 +212,3 @@ check_opts() {
 check_opts "$@"
 
 #cpu::set_freq $policy "$min_freq" "$max_freq" performance
-
-

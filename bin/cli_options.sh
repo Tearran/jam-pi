@@ -6,26 +6,34 @@
 # License version 2. This program is licensed "as is" without any
 # warranty of any kind, whether express or implied.
 #
-#  CPU related tests.
 #
 
-[[ -d "$HOME/.local/lib/bash-utility" ]] && toollib="$HOME/.local/lib" ;
-[[ -d "/home/beta/.local/lib/bash-utility/" ]] && toollib="/usr/lib" ;
+directory="$(dirname "$(readlink -f "$0")")"
+filename=$(basename "${BASH_SOURCE[0]}")
+
+libpath="$directory/../lib"
+selfpath="$libpath/configng/cpu.sh"
+
+if [[ -d "$directory/../lib" ]]; then
+    libpath="$directory"/../lib
+elif [[ -d "/usr/lib/bash-utility/" && -d "/usr/lib/configng/" ]]; then
+    libpath="/usr/lib"
+else
+    echo "Libraries not found"
+    exit 0
+fi
 
 # Source the files relative to the script location
-source "$toollib/bash-utility/string.sh"
-source "$toollib/bash-utility/collection.sh"
-source "$toollib/bash-utility/array.sh"
-source "$toollib/bash-utility/check.sh"
-source "$toollib/armbian-config/cpu.sh"
+source "$libpath/bash-utility/string.sh"
+source "$libpath/bash-utility/collection.sh"
+source "$libpath/bash-utility/array.sh"
+source "$libpath/bash-utility/check.sh"
+source "$libpath/configng/cpu.sh"
 
-[[ -f "$HOME/.local/lib/armbian-config/cpu.sh" ]]  && libpath="$HOME/.local/lib/armbian-config/cpu.sh"
-[[ -f "/usr/lib/armbian-config/cpu.sh" ]]  && libpath="/usr/lib/armbian-config/cpu.sh"
-
-readarray -t functionarray < <(grep -oP '^\w+::\w+' "$libpath")
-readarray -t funnamearray < <(grep -oP '^\w+::\w+' "$libpath" | sed 's/.*:://')
-readarray -t catagoryarray < <(grep -oP '^\w+::\w+' "$libpath" | sed 's/::.*//')
-readarray -t descriptionarray < <(grep -oP '^# @description.*' "$libpath" | sed 's/^# @description //')
+readarray -t functionarray < <(grep -oP '^\w+::\w+' "$selfpath")
+readarray -t funnamearray < <(grep -oP '^\w+::\w+' "$selfpath" | sed 's/.*:://')
+readarray -t catagoryarray < <(grep -oP '^\w+::\w+' "$selfpath" | sed 's/::.*//')
+readarray -t descriptionarray < <(grep -oP '^# @description.*' "$selfpath" | sed 's/^# @description //')
 
 # test array
 #printf '%s\n' "${functionarray[@]}"
@@ -67,8 +75,11 @@ check_opts() {
       echo "Invalid function name"
     fi
 
-  elif [ "$1" == "-p" ]; then
-    see_proposed
+  elif [[ "$1" == "dev" && "$2" == "cpu::set_freq" ]]; then
+    # Disabled till understood.
+    echo "cpu::set_freq policy min_freq max_freq performance"
+    echo "Disabled durring current testing"
+
   else
     see_help 
   fi
@@ -77,4 +88,3 @@ check_opts() {
 #check_opts_test1 "$@"
 check_opts "$@"
 
-#cpu::set_freq $policy "$min_freq" "$max_freq" performance
