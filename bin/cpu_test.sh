@@ -9,7 +9,7 @@
 #  CPU related tests.
 #
 
-    LD_LIBRARY_PATH="/home/beta/.local/lib"
+LD_LIBRARY_PATH="/home/beta/.local/lib"
 
 # Source the files relative to the script location
 source "/home/beta/.local/lib/bash-utility/string.sh"
@@ -111,8 +111,8 @@ see_help(){
 	done
 
 	}
-
-check_opts_1()
+# check for -dev -h options 
+check_opts_test1()
 {
     if [[ "$1" == -dev ]] ; then
         default="bash"
@@ -143,7 +143,9 @@ check_opts_1()
     fi
 }
 
-check_opts_2(){
+# check for -h -dev 
+# if -dev check for number
+check_opts_test2(){
 
 if [ "$1" == "-dev" ]; then
   shift  # Shifts the arguments to the left, excluding the first argument ("-dev")
@@ -163,7 +165,8 @@ else
 fi
 
 }
-
+# check for -h -dev @ $1
+# if -dev check @ $1 remove and shift $1 to check for x
 check_opts() {
   if [ "$1" == "-dev" ]; then
     shift  # Shifts the arguments to the left, excluding the first argument ("-dev")
