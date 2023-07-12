@@ -6,16 +6,19 @@ Just another menu for Pi configuration.
 
 The idea is to use the provided API as a standalone application or as multiple applications. Some considerations for this design include:
 
-- Management:
-  - divided into levels
-  - Individual applications can be updated as needed        
-- user privlage handeling
-  - Can be run as a non-sudo user, only calling superuser privileges when necessary
-- Pass command line arguments:
-  - command-line options for specifying the program to use for displaying messages (`-b` for `bash TUI`, `-w` for `whiptail CLIUI`, and `-n` for `dialog CLIUI`). It also includes a `help`
-- Potential to reduce system resources needed on low-end devices
+cli_options.sh
+```bash 
 
-
-Note: The GUI algorithm has not yet been written, but the necessary data structures (such as arrays) are in place.
-
-Note: The command-line arguments empliment ,the necessary data structures (such as getopt and "$@) are bing tested. 
+Usage:  [ -h | -dev ]
+Options:
+        -h  Print this help.
+        -dev Options:
+                cpu::get_policy Return policy as int based on original armbian-config logic.
+                cpu::get_freqs  Return CPU frequencies as string delimited by space.
+                cpu::get_min_freq       Return CPU minimum frequency as string.
+                cpu::get_max_freq       Return CPU maximum frequency as string.
+                cpu::get_governor       Return CPU governor as string.
+                cpu::get_governors      Return CPU governors as string delimited by space.
+                cpu::set_freq   Set min, max and CPU governor.
+beta@beta:~$
+```
