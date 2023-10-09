@@ -11,6 +11,4 @@ The idea is to utilize Jampi-library for a CLI (Command Line Interface) to inter
 ## Jampi-tui
 The idea is to have a Text-based User Interface to interact with Jampi-config.
 
-## Jampi-wui
-The idea is to have a Web-based User Interface to interact with Jampi-config.
   
