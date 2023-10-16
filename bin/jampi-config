@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Save the current screen
+tput smcup
+
+
 
 # Get the directory of the script
 directory="$(dirname "${BASH_SOURCE[0]}")"
@@ -57,8 +61,9 @@ choice=$(get_choice "${options[@]}")
 
 if [ -n "$choice" ]; then
     echo "You chose category: $choice"
-    "$lib_path/$choice/about_$choice.sh"
+    bash "$lib_path/$choice/about_$choice.sh"
 else
     echo "No choice was made."
 fi
 
+tput rmcup
