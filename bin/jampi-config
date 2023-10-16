@@ -1,9 +1,6 @@
 #!/bin/bash
 
-# Save the current screen
-tput smcup
-
-
+clear
 
 # Get the directory of the script
 directory="$(dirname "${BASH_SOURCE[0]}")"
@@ -56,14 +53,21 @@ get_choice() {
     echo "$choice"
 }
 
+# Set debug variable
+debug=1
+
+
 # Call the function to display the menu and get the user's choice
 choice=$(get_choice "${options[@]}")
 
 if [ -n "$choice" ]; then
-    echo "You chose category: $choice"
     bash "$lib_path/$choice/about_$choice.sh"
+    if [ "$debug" -eq 1 ]; then
+    # Debug output
+    echo "Debug info:"
+    echo "You chose category: $choice"
+    echo "You chose file: $choice.sh"
+fi
 else
     echo "No choice was made."
 fi
-
-tput rmcup
