@@ -1,0 +1,75 @@
+#!/bin/bash
+
+
+# Get the directory of the script
+directory="$(dirname "${BASH_SOURCE[0]}")"
+# Get the filename without the path
+filename="$(basename "${BASH_SOURCE[0]}")"
+# Define the lib path relative to the script location
+lib_path="$directory/../lib/config"
+# Change to the script's directory
+cd "$directory" || exit
+
+
+## Create an associative array to store category descriptions
+#declare -A category_descriptions
+## Populate the array with category descriptions based on directory names
+#for category_dir in "$lib_path"/*; do
+#    if [[ -d "$category_dir" ]]; then
+#        category_name=$(basename "$category_dir")
+#        category_descriptions["$category_name"]="${category_descriptions["$category_name"]} functions description"
+#    fi
+#done
+
+# Get a list of categories
+categories=($(ls "$lib_path"))
+
+# Create an associative array to store category descriptions
+declare -A category_descriptions
+
+# Populate the array with category descriptions based on about_*.sh files
+for category in "${categories[@]}"; do
+    about_file="$lib_path/$category/about_$category.sh"
+    if [[ -f "$about_file" ]]; then
+        category_descriptions["$category"]=$(grep "^# @description" "$about_file" | sed 's/^# @description //')
+    fi
+done
+
+# Get a list of categories
+categories=($(ls "$lib_path"))
+
+# Create an options array for the menu
+options=()
+for category in "${categories[@]}"; do
+    options+=("$category" "${category_descriptions[$category]}")
+done
+# Function to display the menu and get the user's choice
+
+get_choice() {
+    local options=("$@")
+    local choice
+
+    if [[ $DISPLAY ]] && command -v zenity >/dev/null 2>&1; then
+        choice=$(zenity --list --title="Categories" --column="Category" --column="Description" "${options[@]}")
+    elif command -v whiptail >/dev/null 2>&1; then
+        choice=$(whiptail --title "Categories" --menu "Choose a category:" 15 60 4 "${options[@]}" 3>&1 1>&2 2>&3)
+    elif command -v dialog >/dev/null 2>&1; then
+        choice=$(dialog --title "Categories" --menu "Choose a category:" 15 60 4 "${options[@]}" 3>&1 1>&2 2>&3)
+    else
+        echo "Neither whiptail nor dialog is installed" >&2
+        exit 1
+    fi
+
+    echo "$choice"
+}
+
+# Call the function to display the menu and get the user's choice
+choice=$(get_choice "${options[@]}")
+
+if [ -n "$choice" ]; then
+    echo "You chose category: $choice"
+    "$lib_path/$choice/about_$choice.sh"
+else
+    echo "No choice was made."
+fi
+
