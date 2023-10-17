@@ -13,10 +13,8 @@
 #
 # @stdout A Here Doc armbian logo
 function hello_art::art_armbian() {
-    clear
-    
-    cat << EOF
 
+cat << EOF
       █ █ █ █ █ █ █ █ █ █ █
      ███████████████████████
    ▄▄██                   ██▄▄
@@ -31,36 +29,7 @@ function hello_art::art_armbian() {
    ▄▄██                   ██▄▄
      ███████████████████████
       █ █ █ █ █ █ █ █ █ █ █
-
 EOF
-echo -e "\n\n"
-    echo -ne " \r"
-    sleep 1
-    echo -ne " ■)\r"
-    sleep 1
-    echo -ne " ■_■)\r"
-    sleep 1
-    echo -ne " (⌐■_■)\r"
-    sleep 1
-    echo -ne " (⌐■_■)\r"
-    sleep 1
-    echo -ne " ( •_•)>⌐■-■  - Oh hi there,                                  \r"
-    sleep 2
-    echo -ne " ( •_•)       - Welcome to Armbian!                           \r"
-    sleep 2
-    echo -ne "  (•_•)       - This is an example for the new armbina-config!\r"
-    sleep 2
-    echo -ne "  (•_•)       - Armbina-config now uses metadata for the menu!\r"
-
-    echo -e  "\n\n"
-    sleep 1
-    echo -ne "  exit in. 3 \r"
-    sleep 1
-    echo -ne "  exit in. 2 \r"
-    sleep 1
-    echo -ne "  exit in. 1 \r"
-    sleep 1
-
 	return 0
 
 	}

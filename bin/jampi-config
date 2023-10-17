@@ -1,7 +1,8 @@
 #!/bin/bash
 
 clear
-
+# Set debug variable
+debug=0
 # Get the directory of the script
 directory="$(dirname "${BASH_SOURCE[0]}")"
 # Get the filename without the path
@@ -53,8 +54,21 @@ get_choice() {
     echo "$choice"
 }
 
-# Set debug variable
-debug=1
+show_completion_message() {
+    message="Successfully Completed ."
+    if [[ $DISPLAY ]] && command -v zenity >/dev/null 2>&1; then
+        zenity --info --title="Completion Message" --text="$message"
+    elif command -v whiptail >/dev/null 2>&1; then
+        whiptail --msgbox --title "Intro to Whiptail" "$message" 25 80
+    elif command -v dialog >/dev/null 2>&1; then
+        dialog --msgbox "$message" 6 40
+    else
+        echo "Neither whiptail nor dialog is installed" >&2
+        exit 1
+    fi
+    echo "Show Completion Message Done"  # Add this line for debugging
+}
+
 
 
 # Call the function to display the menu and get the user's choice
@@ -64,10 +78,11 @@ if [ -n "$choice" ]; then
     bash "$lib_path/$choice/about_$choice.sh"
     if [ "$debug" -eq 1 ]; then
     # Debug output
-    echo "Debug info:"
-    echo "You chose category: $choice"
-    echo "You chose file: $choice.sh"
-fi
+    	echo "Debug info:"
+    	echo "You chose category: $choice"
+    	echo "You chose file: $choice.sh"
+	fi
+    show_completion_message
 else
     echo "No choice was made."
 fi
