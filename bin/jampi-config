@@ -66,7 +66,7 @@ show_completion_message() {
         echo "Neither whiptail nor dialog is installed" >&2
         exit 1
     fi
-    echo "Show Completion Message Done"  # Add this line for debugging
+    #echo "Show Completion Message Done"  # Add this line for debugging
 }
 
 
@@ -82,7 +82,7 @@ if [ -n "$choice" ]; then
     	echo "You chose category: $choice"
     	echo "You chose file: $choice.sh"
 	fi
-    show_completion_message
+    # show_completion_message
 else
     echo "No choice was made."
 fi
