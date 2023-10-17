@@ -29,16 +29,22 @@ frames=(
 )
 
 text=(
-    " "    
-    " "
-    "Oh, hello."
-    "This Hello Library example"
-    "Copy the misc folder and its contents with a new name"
-    "Rename new folder and about_misc.sh to local/about_local.sh"
-    "Edit the about_local.sh  to \n# @description language, keyboard, and time zone."
-    "This will create a new category entry in the main menu\nThe about will add the new subcategory menu"
-    "\n\nThank you for watching\n"
-    ""
+
+    "Welcome to the Hello Library Tutorial"
+    "This tutorial demonstrates how to use the Hello Library to create a new category." 
+    "Copy the entire \"misc\" folder along with its contents to create a new category."
+    "Rename the newly copied folder to \"local\""
+    "rename the file \"about_misc.sh\" to \"about_local.sh\"."
+    "Open the \"about_local.sh\" file and edit the description of the new category."
+    "For example: # @description Language, keyboard, and time zone settings."
+    "Main Menu will update"
+    "This action will automatically create a new category entry in the main menu."
+    "View the About Section"
+    "Navigate to the new section in the main menu to see the new subcategory entry."
+    "Thank you for following this tutorial! If you have any questions or need further assistance, feel free to reach out."
+    "License This program is licensed under the terms of the GNU General Public License version 2."
+
+
 )
 
 commands=(
@@ -53,8 +59,9 @@ commands=(
 # Loop through frames
 clear
 for i in "${!frames[@]}"; do
-    echo -e "\e[H \n\n\n \e[K ${frames[i]}"
+
     echo -e "\n\n\e[K ${text[i]}\n\n\n\n"
+        echo -e "\e[H \n\n\n \e[K ${frames[i]}"
     eval "${commands[i]}"  # Execute the command
     sleep 2
 done
