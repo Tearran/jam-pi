@@ -1,50 +1,31 @@
+# Jampi-Config
 
-# jampi-config
+Jampi-Config is a front-end menu-driven interface for executing various scripts and functions. It tries to simplify the process of creating and managing configuration options. Here's how you can create a new menu entry:
 
-This script provides a menu-driven interface for executing various functions. It is designed to be a flexible tool for managing different applications and functionalities.
-
-## Adding Functions
-To add a new function, create a new .sh file in the appropriate category directory (e.g., lib/config/misc/). The file should follow the naming convention function_name.sh and include the necessary metadata in the comments.
-
-For example:
+1. **Create a bash script**: This file should contain commands to configure your computer to run.
+    - Here's an example of a bash script that you can use as a menu entry:
 
 ```bash
 #!/bin/bash
+
+# @description This function will print a greeting
 #
-# @description My custom function.
-#
-# @exitcode 0  If successful.
-#
-# @stdout Output of the function.
-function my_app::my_function() {
-    echo "Hello, World!"
+# @stdout Hello World
+greeting::say_greeting() {
+    echo "Hello World"
 }
-Function Metadata
-@description: Briefly describe the purpose of the function.
-@exitcode: Specify the exit code in case of success.
-@stdout: Describe the expected output of the function.
-License
-This script is licensed under the terms of the GNU General Public License version 2.
 ```
+Add a description: At the top of your main function in your bash script, add a special comment that starts with # @description. This comment should explain what your script does.
 
-# Welcome to the Hello Library Tutorial
+Save your script: Save this file in the lib/configng/$folder/ directory. Replace $folder with the name of the folder where you want to save your script.
 
-This tutorial demonstrates how to use the Hello Library to create a new category. Follow the steps below to get started:
+Run Jampi-Config: Now, when you run Jampi-Config, it will automatically find your new script and add a new entry to the menu.
 
-- Copy the entire "misc" folder along with its contents to create a new category.
-- Rename the newly copied folder to "local" 
-- rename the file "about_misc.sh" to "about_local.sh".
-- Open the "about_local.sh" file and edit the description to reflect the purpose of the new category.
-    - For example: `# @description Language, keyboard, and time zone settings.`
-   
-- Main Menu will udate
-  - This action will automatically create a new category entry in the main menu.
-  - View the About Section
-  - Navigate to the new section in the main menu to see the new subcategory entry.
+# Understanding Folders and Categories: 
 
-Thank you for following this tutorial! 
-If you have any questions or need further assistance, feel free to reach out.
- 
+In Jampi-Config, folders are used to organize scripts into categories. Each subfolder in the lib/config/ directory represents a category in the menu. When you select a category, it will open a submenu containing all the scripts in that category’s folder. So, make sure to place your script in an appropriate category folder.
+
+
 License
 This program is licensed under the terms of the GNU General Public License version 2.
 
