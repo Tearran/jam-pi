@@ -1,40 +1,40 @@
 #!/bin/bash
 
 clear
-# Set debug variable
-debug=0
-# Get the directory of the script
+
+debug=1
 directory="$(dirname "${BASH_SOURCE[0]}")"
-# Get the filename without the path
+cd $diectory
 filename="$(basename "${BASH_SOURCE[0]}")"
-# Define the lib path relative to the script location
 lib_path="$directory/../lib/config"
-# Change to the script's directory
-cd "$directory" || exit
+sub_config="config"
 
-# Get a list of categories
-categories=($(ls "$lib_path"))
-
-# Create an associative array to store category descriptions
 declare -A category_descriptions
+declare -A cli_options
 
-# Populate the array with category descriptions based on about_*.sh files
-for category in "${categories[@]}"; do
-    about_file="$lib_path/$category/about_$category.sh"
-    if [[ -f "$about_file" ]]; then
-        category_descriptions["$category"]=$(grep "^# @description" "$about_file" | sed 's/^# @description //')
-    fi
-done
+populate_options() {
 
-# Get a list of categories
-categories=($(ls "$lib_path"))
+    options=(
+	)
 
-# Create an options array for the menu
-options=()
-for category in "${categories[@]}"; do
-    options+=("$category" "${category_descriptions[$category]}")
-done
-# Function to display the menu and get the user's choice
+	cli_options=(
+	    ["-h"]="Print this help."
+	    ["-l"]="List available function"
+	)
+
+	categories=(
+		$(ls "$lib_path")
+	)
+
+    for category in "${categories[@]}"; do
+        config_file="$lib_path/$category/${sub_config}_${category}"
+        if [[ -f "$config_file" ]]; then
+            category_descriptions["$category"]=$(grep "^# @description" "$config_file" | sed 's/^# @description //')
+            options+=("$category" "${category_descriptions[$category]}")
+        fi
+    done
+
+}
 
 get_choice() {
     local options=("$@")
@@ -54,35 +54,51 @@ get_choice() {
     echo "$choice"
 }
 
-show_completion_message() {
-    message="Successfully Completed ."
-    if [[ $DISPLAY ]] && command -v zenity >/dev/null 2>&1; then
-        zenity --info --title="Completion Message" --text="$message"
-    elif command -v whiptail >/dev/null 2>&1; then
-        whiptail --msgbox --title "Intro to Whiptail" "$message" 25 80
-    elif command -v dialog >/dev/null 2>&1; then
-        dialog --msgbox "$message" 6 40
+handle_choice() {
+    local choice=$(get_choice "${options[@]}")
+    if [ -n "$choice" ]; then
+        bash "$lib_path/$choice/${sub_config}_$choice"
+        if [ "$debug" -eq 1 ]; then
+            echo "Debug info:"
+            echo "You chose category: $choice"
+            echo "You chose file: ${sub_config}_$choice"
+        fi
     else
-        echo "Neither whiptail nor dialog is installed" >&2
-        exit 1
+        echo "No choice was made."
     fi
-    #echo "Show Completion Message Done"  # Add this line for debugging
+}
+
+see_help() {
+    echo -e "Usage: ${filename%.*} [options]"
+    echo -e "  Options:"
+    for option in "${!cli_options[@]}"; do
+        echo -e "    $option, ${cli_options[$option]}"
+    done
+}
+
+
+see_list(){
+
+    echo -e "Usage: ${filename%.*} [options]"
+    echo -e "  Options:"
+    for option in "${!options[@]}"; do
+        echo -e "    $option, ${options[$option]}"
+    done
+
+}
+
+check_opts() {
+    populate_options
+    if [ "$1" == "-h" ]; then
+        see_help
+        see_list
+    elif [ "$1" == "-l" ]; then
+        see_list
+    else
+        handle_choice
+    fi
 }
 
 
 
-# Call the function to display the menu and get the user's choice
-choice=$(get_choice "${options[@]}")
-
-if [ -n "$choice" ]; then
-    bash "$lib_path/$choice/about_$choice.sh"
-    if [ "$debug" -eq 1 ]; then
-    # Debug output
-    	echo "Debug info:"
-    	echo "You chose category: $choice"
-    	echo "You chose file: $choice.sh"
-	fi
-    # show_completion_message
-else
-    echo "No choice was made."
-fi
+check_opts $1

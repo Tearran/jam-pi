@@ -1,0 +1,141 @@
+#!/bin/bash
+
+# Copyright (c) Authors: http://www.armbian.com/authors, info@armbian.com
+#
+# This file is licensed under the terms of the GNU General Public
+# License version 2. This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
+
+directory="$(dirname "${BASH_SOURCE[0]}")" ;
+cd "$directory"
+filename="$(basename "${BASH_SOURCE[0]}")" ;
+libpath="$directory/../lib"
+
+if [[ -d "$directory/../lib" ]]; then
+    libpath="$directory"/../lib
+else
+    echo "Libraries not found"
+    exit 0
+fi
+
+# shellcheck source=/dev/null
+for file in "$libpath"/config/*/*.sh; do
+    source "$file"
+done
+
+functionarray=()
+funnamearray=()
+categoryarray=()
+descriptionarray=()
+
+categories=($(ls -d "$libpath/config"/*))
+
+# Loop through each category
+for category in "${categories[@]}"; do
+    # Loop through each file in the category
+    for file in "$category"/*.sh; do
+
+        # Extract functions (Full) and add to arrays
+        mapfile -t temp_functionarray < <(grep -oP '(?<=function\s)\w+::\w+' "$file" )
+        functionarray+=("${temp_functionarray[@]}")
+
+        # Extract function names "if this one is before ::" and add to array
+        mapfile -t temp_funnamearray < <(grep -oP '(?<=function\s)\w+::\w+' "$file" | sed 's/.*:://')
+        mapfile -t temp_funnamearray < <(grep -oP '(?<=function\s)\w+::\w+' "$file" | sed 's/.*:://')
+        funnamearray+=("${temp_funnamearray[@]}")
+
+        # Extract category names ":: after" and add to array
+        mapfile -t temp_categoryarray < <(grep -oP '(?<=function\s)\w+::\w+' "$file"  | sed 's/::.*//')
+        categoryarray+=("${temp_categoryarray[@]}")
+
+        # Extract descriptions and add to array
+        mapfile -t temp_descriptionarray < <(grep -oP '^# @description.*' "$file" | sed 's/^# @description //')
+        descriptionarray+=("${temp_descriptionarray[@]}")
+
+        # Extract options and add to array
+        mapfile -t temp_optionarray < <(grep -oP '^# @options.*' "$file" | sed 's/^# @options //')
+        optionarray+=("${temp_optionarray[@]}")
+
+
+    done
+done
+
+# @description See help message
+see_help(){
+
+    # Extract unique prefixes
+    declare -A prefixes
+    for i in "${!functionarray[@]}"; do
+        prefix="${functionarray[i]%%::*}"
+        prefixes["$prefix"]=1
+    done
+
+    # Construct usage line
+    usage=""
+    for prefix in "${!prefixes[@]}"; do
+        usage+=" | $prefix [ options ] "
+    done
+
+    echo -e "Usage: ${filename%.*} [options]"
+    echo -e "  Options:"
+    echo -e "    -h,    Print this help."
+    echo
+    echo -e "    -r,    Run a function group."
+
+	see_function
+
+	}
+
+# @description See help message
+see_function() {
+    # Print grouped options
+    echo
+    echo -e "Groups and Options:"
+    echo
+    for ((i=0; i<${#functionarray[@]}; i++)); do
+        function_name="${functionarray[i]}"
+        description="${descriptionarray[i]}"
+        echo -e "  ${function_name}  [options]"
+        echo -e "        $description"
+    done
+}
+
+# Check command-line options
+check_opts(){
+  if [ "$1" == "-r" ] || [ "$1" == "--run" ] ; then
+    shift  # Shifts the arguments to the left, excluding the first argument ("-r")
+    group_name="$1"  # Takes the first argument as the group name
+    shift 1  # Shifts the arguments again to exclude the group name
+
+    found=false
+
+    for ((i=0; i<${#categoryarray[@]}; i++)); do
+      if [ "$group_name" == "${categoryarray[i]}" ]; then
+        found=true
+
+        # Loop through each function in the group
+        for ((j=0; j<${#categoryarray[@]}; j++)); do
+          if [ "${categoryarray[j]}" == "$group_name" ]; then
+            # Call the corresponding function using variable indirection
+            "${functionarray[j]}" "$@"
+          fi
+        done
+
+        break
+      fi
+    done
+
+    if ! $found; then
+      echo "Group not found"
+    fi
+
+  elif [ "$1" == "-h" ]; then
+      see_help
+  else
+	echo "Unknown option:"
+    see_help
+  fi
+}
+
+
+check_opts "$@"

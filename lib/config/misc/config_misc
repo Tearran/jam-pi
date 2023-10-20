@@ -1,0 +1,81 @@
+#!/bin/bash
+
+directory="$(dirname "${BASH_SOURCE[0]}")"
+lib_path="$directory/../lib/config"
+#echo "$lib_path" ; exit 0
+
+# @description A catch all for misc apps
+get_choice() {
+    local options=("$@")
+    local choice
+
+    if [[ $DISPLAY ]] && command -v zenity >/dev/null 2>&1; then
+        choice=$(zenity --list --title="Functions" --column="Function" --column="Description" "${options[@]}")
+    elif command -v whiptail >/dev/null 2>&1; then
+        choice=$(whiptail --title "Functions" --menu "Choose a function:" 15 60 4 "${options[@]}" 3>&1 1>&2 2>&3)
+    elif command -v dialog >/dev/null 2>&1; then
+        choice=$(dialog --title "Functions" --menu "Choose a function:" 15 60 4 "${options[@]}" 3>&1 1>&2 2>&3)
+    else
+        read -r -p "Choose a function:" choice
+    fi
+
+    echo "$choice"
+}
+
+# Function to collect function descriptions
+collect_function_descriptions() {
+    declare -A function_descriptions
+
+    for func_file in "$directory"/*.sh; do
+        func_name=$(basename "$func_file" .sh)
+        if [[ $func_name != about_* ]]; then
+            function_descriptions["$func_name"]=$(grep "^# @description" "$func_file" | sed 's/^# @description //')
+        fi
+    done
+
+    options=()
+    for func in "${!function_descriptions[@]}"; do
+        # Extract the short name (function name after '::') and description
+        short_name=${func%%::*}
+        description=${function_descriptions[$func]}
+        options+=("$short_name" "$description")  # Add short name and description
+    done
+}
+
+# Function to handle user's choice
+handle_choice() {
+    local choice="$1"
+
+    if [ -n "$choice" ]; then
+        echo "You chose category: $choice"
+
+        # Extract the function name from the metadata block
+        local function_name=$(grep -oP '(?<=function\s)\w+::\w+' "$directory/$choice.sh")
+
+        if [ -n "$function_name" ]; then
+            echo "You chose file: $choice.sh"
+
+            # Source the file to make the function available
+            source "$directory/$choice.sh"
+
+            # Call the function
+            "$function_name"
+        else
+            echo "$function_name not found in metadata."
+        fi
+    else
+        echo "No choice was made."
+    fi
+}
+
+# Get the directory of the script
+
+
+# Collect function descriptions
+collect_function_descriptions
+
+# Call the function to display the menu and get the user's choice
+choice=$(get_choice "${options[@]}")
+
+# Handle user's choice
+handle_choice "$choice"
