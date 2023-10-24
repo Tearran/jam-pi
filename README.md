@@ -6,13 +6,26 @@ Jampi-Config is a front-end menu-driven interface for executing various scripts 
     - Here's an example of a bash script that you can use as a menu entry:
 
 ```bash
-#!/bin/bash
-
-# @description This function will print a greeting
+# @description Hello World description.
 #
-# @stdout Hello World
-greeting::say_greeting() {
-    echo "Hello World"
+# @exitcode 0  If successful.
+#
+# @options none
+function hello::see_world(){
+
+	echo "hello world"
+    return 0
+}
+
+# @description test description.
+#
+# @exitcode 0  If successful.
+#
+# @options none
+function tests::see_test(){
+
+	echo "hello world"
+    return 0
 }
 ```
 Add a description: At the top of your main function in your bash script, add a special comment that starts with # @description. This comment should explain what your script does.
